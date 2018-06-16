@@ -86,6 +86,12 @@ def downloadImage(url):
 
 
 # Connect to Twitter and authenticate
+#   Credentials are stored in "credentials.yml" which contains four lines:
+#   CONSUMER_KEY: "x1F3s..."
+#   CONSUMER_SECRET: "3VNg..."
+#   ACCESS_KEY: "7109..."
+#   ACCESS_SECRET: "AdnA..."
+#
 def initTwitter():
   with open("credentials.yml", "r") as f:
     cred = yaml.load(f)
