@@ -173,14 +173,17 @@ def main():
   feeds = readFeedsList()
   posted = readPosted()
 
-  print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
-  print(f"Feed list has {len(feeds)} feeds\n")
-
   # Connect to Twitter, unless requested not to
   if "--do-not-tweet" in sys.argv:
     api = None
   else:
     api = initTwitter()
+
+  print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+  if api:
+    last = api.user_timeline(count = 1)[0].created_at
+    print(f"Last tweet was posted at {last} (UTC)")
+  print(f"Feed list has {len(feeds)} feeds\n")
 
   for feed in feeds:
     parsed_feed = feedparser.parse(feed)
