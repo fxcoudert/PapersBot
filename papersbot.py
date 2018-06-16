@@ -15,6 +15,8 @@ import imghdr, os, re, sys, tempfile, time, urllib, yaml
 
 
 # Twitter parameters
+# These values should be queried "no more than once a day" by 
+# tweepy's api.configuration(), but for now they are fixed here.
 TWEET_MAX_LENGTH = 280
 TWEET_URL_LENGTH = 24
 TWEET_IMG_LENGTH = 25
