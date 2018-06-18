@@ -25,12 +25,14 @@ TWEET_NET_LENGTH = TWEET_MAX_LENGTH - TWEET_URL_LENGTH - TWEET_IMG_LENGTH
 
 # This is the regular expression that selects the papers of interest
 regex = re.compile(r"""
-  (   \b(MOF|MOFs|COF|COFs)\b
+  (   \b(MOF|MOFs|COF|COFs|ZIF|ZIFs)\b
     | metal.organic.framework
     | covalent.organic.framework
     | metal–organic.framework
     | covalent–organic.framework
+    | imidazolate.framework
     | porous.coordination.polymer
+    | framework.material
   )
   """, re.IGNORECASE | re.VERBOSE)
 
