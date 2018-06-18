@@ -25,6 +25,7 @@ CONSUMER_SECRET: "3VNg..."
 ACCESS_KEY: "7109..."
 ACCESS_SECRET: "AdnA..."
 ```
+If you do not know how to get your Twitter credentials, follow [steps #1 and #2 in this tutorial](https://www.digitalocean.com/community/tutorials/how-to-create-a-twitter-app) to register your app with Twitter and get credentials.
 - Adjust the file `feeds.txt` which contains the list of RSS feeds you want to crawl. Lines starting with `#` are ignored.
 
 ## How to run
