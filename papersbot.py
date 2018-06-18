@@ -49,6 +49,43 @@ def entryMatches(entry):
     return False
 
 
+acsTwitter = { "acsaem": "acs_aem", "acsami": "acs_ami", "acsanm": "acs_anm", "acscatal": "ACSCatalysis",
+  "acscentsci": "ACSCentSci", "acsenergylett": "ACSEnergyLett", "acsnano": "acsnano", "acssuschemeng": "ACSSustainable",
+  "acs.chemrev": "ACSChemRev", "acs.chemmater": "ChemMater", "acs.cgd": "CGD_ACS", "acs.est": "EnvSciTech",
+  "acs.inorgchem": "InorgChem", "jacs": "J_A_C_S", "acs.jcim": "JCIM_ACS", "acs.jpcb": "JPhysChem", "acs.jpcc": "JPhysChem",
+  "acs.jpclett": "JPhysChem", "acs.langmuir": "ACS_Langmuir", "acs.nanolett": "NanoLetters" }
+rscTwitter = { "CY": "CatalysisSciTec", "CC": "ChemCommun", "SC": "ChemicalScience", "CS": "ChemSocRev", "CE": "CrystEngComm",
+  "DT": "DaltonTrans", "EE": "EES_journal", "EN": "EnvSciRSC", "FD": "Faraday_D", "GC": "green_rsc", "TA": "JMaterChem",
+  "TB": "JMaterChem", "TC": "JMaterChem", "NR": "Nanoscale_RSC", "CP": "PCCP", "SM": "SoftMatter" }
+natureTwitter = { "s41563": "NatureMaterials", "s41557": "NatureChemistry", "s42004": "CommsChem", "s41467": "NatureComms",
+  "s41929": "NatureCatalysis", "s41560": "NatureEnergyJnl", "s41565": "NatureNano", "s41567": "NaturePhysics",
+  "s42005": "CommsPhys", "s41570": "NatRevChem", "s41578": "NatRevMater" }
+wileyTwitter = { "adma": "AdvMater", "adfm": "AdvFunctMater", "anie": "angew_chem", "chem": "ChemEurJ", "asia": "ChemAsianJ",
+  "cplu": "ChemPlusChem", "cphc": "ChemPhysChem" }
+
+# From a given URL, figure out the corresponding journal Twitter handle
+# (This will work well for ACS, RSC, and Wiley Chemistry)
+def journalHandle(url):
+  try:
+    if "doi.org/10.1021/" in url:
+      j = ".".join(url.split("/")[-1].split(".")[:-1])
+      return acsTwitter[j]
+    if "pubs.rsc.org/en/Content/ArticleLanding" in url:
+      j = url.split("/")[-2].split(".")[0]
+      return rscTwitter[j]
+    if "www.nature.com/articles" in url:
+      j = url.split("/")[-1].split("-")[0]
+      return natureTwitter[j]
+    if "onlinelibrary.wiley.com/doi/abs/10.1002/" in url:
+      j = url.split("/")[-1].split(".")[0]
+      return wileyTwitter[j]
+    if "chemrxiv.org/" in url:
+      return "chemRxiv"
+
+  except:
+    return None
+
+
 # Find the URL for an image associated with the entry
 def findImage(entry):
   soup = bs4.BeautifulSoup(entry.description, "html.parser")
@@ -143,7 +180,14 @@ def addToPosted(url):
 def sendTweet(entry, api):
   title = cleanText(htmlToText(entry.title))
   url = entry.id
-  tweet_body = title[:TWEET_NET_LENGTH] + " " + url
+  length = TWEET_NET_LENGTH - 1
+
+  handle = journalHandle(url)
+  if handle:
+    length -= len(handle) + 2
+    url = f"@{handle} {url}"
+
+  tweet_body = title[:length] + " " + url
 
   image = findImage(entry)
   image_file = downloadImage (image)
