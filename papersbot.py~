@@ -195,12 +195,12 @@ def sendTweet(entry, api):
   image_file = downloadImage (image)
 
   if image_file:
-    print("TWEET: {}\nIMAGE: {}\n".format(tweet_body, image))
+    print(f"TWEET: {tweet_body}\nIMAGE: {image}\n")
     if api:
       api.update_with_media (image_file, tweet_body)
     os.remove (image_file)
   else:
-    print("TWEET: {}\n".format(tweet_body))
+    print(f"TWEET: {tweet_body}\n")
     if api:
       api.update_status (tweet_body)
 
