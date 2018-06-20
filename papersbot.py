@@ -187,18 +187,18 @@ def sendTweet(entry, api):
 
   tweet_body = title[:length] + " " + url
 
+  media = None
   image = findImage(entry)
-  image_file = downloadImage (image)
-
+  image_file = downloadImage(image)
   if image_file:
-    print(f"TWEET: {tweet_body}\nIMAGE: {image}\n")
+    print(f"IMAGE: {image}")
     if api:
-      api.update_with_media (image_file, tweet_body)
+      media = [api.media_upload(image_file).media_id]
     os.remove (image_file)
-  else:
-    print(f"TWEET: {tweet_body}\n")
-    if api:
-      api.update_status (tweet_body)
+
+  print(f"TWEET: {tweet_body}\n")
+  if api:
+    api.update_status(tweet_body, media_ids=media)
 
   addToPosted(entry.id)
   if api:
