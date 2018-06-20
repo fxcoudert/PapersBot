@@ -71,6 +71,7 @@ https://onlinelibrary.wiley.com/action/showFeed?jc=1096987x&type=etoc&feed=rss
 https://onlinelibrary.wiley.com/action/showFeed?jc=21926506&type=etoc&feed=rss
 https://onlinelibrary.wiley.com/action/showFeed?jc=14397641&type=etoc&feed=rss
 https://onlinelibrary.wiley.com/action/showFeed?jc=10990682c&type=etoc&feed=rss
+https://onlinelibrary.wiley.com/action/showFeed?jc=23656549&type=etoc&feed=rss
 # Elsevier
 http://rss.sciencedirect.com/publication/science/00108545
 http://rss.sciencedirect.com/publication/science/13877003

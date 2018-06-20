@@ -63,7 +63,7 @@ natureTwitter = { "s41563": "NatureMaterials", "s41557": "NatureChemistry", "s42
   "s41929": "NatureCatalysis", "s41560": "NatureEnergyJnl", "s41565": "NatureNano", "s41567": "NaturePhysics",
   "s42005": "CommsPhys", "s41570": "NatRevChem", "s41578": "NatRevMater" }
 wileyTwitter = { "adma": "AdvMater", "adfm": "AdvFunctMater", "anie": "angew_chem", "chem": "ChemEurJ", "asia": "ChemAsianJ",
-  "cplu": "ChemPlusChem", "cphc": "ChemPhysChem" }
+  "cplu": "ChemPlusChem", "cphc": "ChemPhysChem", "slct": "ChemistrySelect" }
 
 # From a given URL, figure out the corresponding journal Twitter handle
 # (This will work well for ACS, RSC, and Wiley Chemistry)
