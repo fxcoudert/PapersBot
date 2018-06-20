@@ -115,7 +115,7 @@ def downloadImage(url):
     return None
   ext = imghdr.what(img)
   res = img + "." + ext
-  os.rename (img, res)
+  os.rename(img, res)
 
   # Images smaller than 4 KB have a problem, and Twitter will complain
   if os.path.getsize(res) < 4096:
@@ -194,7 +194,7 @@ def sendTweet(entry, api):
     print(f"IMAGE: {image}")
     if api:
       media = [api.media_upload(image_file).media_id]
-    os.remove (image_file)
+    os.remove(image_file)
 
   print(f"TWEET: {tweet_body}\n")
   if api:
