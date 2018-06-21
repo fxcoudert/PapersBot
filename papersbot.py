@@ -63,6 +63,7 @@ natureTwitter = { "s41563": "NatureMaterials", "s41557": "NatureChemistry", "s42
   "s42005": "CommsPhys", "s41570": "NatRevChem", "s41578": "NatRevMater" }
 wileyTwitter = { "adma": "AdvMater", "adfm": "AdvFunctMater", "anie": "angew_chem", "chem": "ChemEurJ", "asia": "ChemAsianJ",
   "cplu": "ChemPlusChem", "cphc": "ChemPhysChem", "slct": "ChemistrySelect" }
+apsTwitter = { "PhysRevLett": "PhysRevLett", "PhysRevX": "PhysRevX", "PhysRevB": "PhysRevB", "PhysRevMaterials": "PhysRevMater" }
 
 # From a given URL, figure out the corresponding journal Twitter handle
 # (This will work well for ACS, RSC, and Wiley Chemistry)
@@ -80,9 +81,17 @@ def journalHandle(url):
     if "onlinelibrary.wiley.com/doi/abs/10.1002/" in url:
       j = url.split("/")[-1].split(".")[0]
       return wileyTwitter[j]
+    if "link.aps.org/doi/10.1103/" in url:
+      j = url.split("/")[-1].split(".")[0]
+      return apsTwitter[j]
     if "chemrxiv.org/" in url:
       return "chemRxiv"
-
+    if "advances.sciencemag.org/" in url:
+      return "ScienceAdvances"
+    if "science.sciencemag.org/" in url:
+      return "ScienceMagazine"
+    if "aip.scitation.org/doi/10.1063/" in url:
+      return "AIP_Publishing"
   except:
     return None
 
