@@ -230,21 +230,30 @@ def main():
   else:
     api = initTwitter()
 
+  # Start-up banner
   print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
   if api:
     last = api.user_timeline(count = 1)[0].created_at
     print(f"Last tweet was posted at {last} (UTC)")
   print(f"Feed list has {len(feeds)} feeds\n")
 
+  # Prepare to count papers
+  n_seen, n_tweeted = 0, 0
+
   for feed in feeds:
     parsed_feed = feedparser.parse(feed)
     for entry in parsed_feed.entries:
       if entryMatches(entry):
+        n_seen += 1
         # If no ID provided, use the link as ID
         if not "id" in entry: entry.id = entry.link
         if not entry.id in posted:
           sendTweet(entry, api)
+          n_tweeted += 1
 
+  # Banner with statistics
+  print(f"Number of relevant papers: {n_seen}")
+  print(f"Number of papers tweeted: {n_tweeted}")
 
 if __name__ == '__main__':
   main()
