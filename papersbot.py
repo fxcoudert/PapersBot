@@ -36,9 +36,6 @@ regex = re.compile(r"""
   """, re.IGNORECASE | re.VERBOSE)
 
 
-# Global variable
-posted = []
-
 
 # We select entries based on title or summary (abstract, for some feeds)
 def entryMatches(entry):
@@ -146,8 +143,7 @@ def initTwitter():
     cred = yaml.load(f)
   auth = tweepy.OAuthHandler(cred["CONSUMER_KEY"], cred["CONSUMER_SECRET"])
   auth.set_access_token(cred["ACCESS_KEY"], cred["ACCESS_SECRET"])
-  api = tweepy.API(auth)
-  return api
+  return tweepy.API(auth)
 
 
 def getTwitterConfig(api):
@@ -191,42 +187,88 @@ def readPosted():
     return []
 
 
-# Add to tweets posted
-def addToPosted(url):
-  with open("posted.dat", "a+") as f:
-    print(url, file=f)
-  posted.append(url)
+class PapersBot:
+  posted = []
+  n_seen = 0
+  n_tweeted = 0
+
+  def __init__(self, doTweet = True):
+    self.feeds = readFeedsList()
+    self.posted = readPosted()
+
+    # Connect to Twitter, unless requested not to
+    if doTweet:
+      self.api = initTwitter()
+      self.twconfig = getTwitterConfig(self.api)
+    else:
+      self.api = None
+
+    # Start-up banner
+    print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+    if self.api:
+      last = self.api.user_timeline(count = 1)[0].created_at
+      print(f"Last tweet was posted at {last} (UTC)")
+    print(f"Feed list has {len(self.feeds)} feeds\n")
 
 
-# Send a tweet for a given feed entry
-def sendTweet(entry, api):
-  title = cleanText(htmlToText(entry.title))
-  url = entry.id
-  length = TWEET_NET_LENGTH - 1
+  # Add to tweets posted
+  def addToPosted(self, url):
+    with open("posted.dat", "a+") as f:
+      print(url, file=f)
+    self.posted.append(url)
 
-  handle = journalHandle(url)
-  if handle:
-    length -= len(handle) + 2
-    url = f"@{handle} {url}"
 
-  tweet_body = title[:length] + " " + url
+  # Send a tweet for a given feed entry
+  def sendTweet(self, entry):
+    title = cleanText(htmlToText(entry.title))
+    url = entry.id
+    length = TWEET_NET_LENGTH - 1
 
-  media = None
-  image = findImage(entry)
-  image_file = downloadImage(image)
-  if image_file:
-    print(f"IMAGE: {image}")
-    if api:
-      media = [api.media_upload(image_file).media_id]
-    os.remove(image_file)
+    handle = journalHandle(url)
+    if handle:
+      length -= len(handle) + 2
+      url = f"@{handle} {url}"
 
-  print(f"TWEET: {tweet_body}\n")
-  if api:
-    api.update_status(tweet_body, media_ids=media)
+    tweet_body = title[:length] + " " + url
 
-  addToPosted(entry.id)
-  if api:
-    time.sleep(5)
+    media = None
+    image = findImage(entry)
+    image_file = downloadImage(image)
+    if image_file:
+      print(f"IMAGE: {image}")
+      if self.api:
+        media = [self.api.media_upload(image_file).media_id]
+      os.remove(image_file)
+
+    print(f"TWEET: {tweet_body}\n")
+    if self.api:
+      self.api.update_status(tweet_body, media_ids=media)
+
+    self.addToPosted(entry.id)
+    self.n_tweeted += 1
+
+    if self.api:
+      time.sleep(5)
+
+
+  # Main function, iterating over feeds and posting new items
+  def run(self):
+    for feed in self.feeds:
+      parsed_feed = feedparser.parse(feed)
+      for entry in parsed_feed.entries:
+        if entryMatches(entry):
+          self.n_seen += 1
+          # If no ID provided, use the link as ID
+          if not "id" in entry: entry.id = entry.link
+          if not entry.id in self.posted:
+            self.sendTweet(entry)
+
+
+  # Print statistics of a given run
+  def printStats(self):
+    print(f"Number of relevant papers: {self.n_seen}")
+    print(f"Number of papers tweeted: {self.n_tweeted}")
+
 
 
 def main():
@@ -236,40 +278,14 @@ def main():
       print(f"Unknown option: {arg}")
       sys.exit(1)
 
-  feeds = readFeedsList()
-  posted = readPosted()
+  # Initialize our bot
+  doTweet = not "--do-not-tweet" in sys.argv
+  bot = PapersBot(doTweet)
 
-  # Connect to Twitter, unless requested not to
-  if "--do-not-tweet" in sys.argv:
-    api = None
-  else:
-    api = initTwitter()
-    getTwitterConfig(api)
+  bot.run()
+  bot.printStats()
 
-  # Start-up banner
-  print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
-  if api:
-    last = api.user_timeline(count = 1)[0].created_at
-    print(f"Last tweet was posted at {last} (UTC)")
-  print(f"Feed list has {len(feeds)} feeds\n")
 
-  # Prepare to count papers
-  n_seen, n_tweeted = 0, 0
-
-  for feed in feeds:
-    parsed_feed = feedparser.parse(feed)
-    for entry in parsed_feed.entries:
-      if entryMatches(entry):
-        n_seen += 1
-        # If no ID provided, use the link as ID
-        if not "id" in entry: entry.id = entry.link
-        if not entry.id in posted:
-          sendTweet(entry, api)
-          n_tweeted += 1
-
-  # Banner with statistics
-  print(f"Number of relevant papers: {n_seen}")
-  print(f"Number of papers tweeted: {n_tweeted}")
 
 if __name__ == '__main__':
   main()
