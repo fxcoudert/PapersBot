@@ -10,7 +10,7 @@
 #
 
 import bs4, feedparser, tweepy
-import imghdr, os, re, sys, tempfile, time, urllib, yaml
+import imghdr, json, os, re, sys, tempfile, time, urllib, yaml
 
 
 # Twitter parameters
@@ -150,6 +150,21 @@ def initTwitter():
   return api
 
 
+def getTwitterConfig(api):
+  # Check for cached configuration, no more than a day old
+  if os.path.isfile("twitter_config.dat"):
+    mtime = os.stat("twitter_config.dat").st_mtime
+    if time.time() - mtime < 24 * 60 * 60:
+      with open("twitter_config.dat", "r") as f:
+        return json.load(f)
+
+  # Otherwise, query the Twitter API and cache the result
+  config = api.configuration()
+  with open("twitter_config.dat", "w") as f:
+    json.dump(config, f)
+  return config
+
+
 # Read our list of feeds from file
 def readFeedsList():
   with open("feeds.txt", "r") as f:
@@ -229,6 +244,7 @@ def main():
     api = None
   else:
     api = initTwitter()
+    getTwitterConfig(api)
 
   # Start-up banner
   print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
