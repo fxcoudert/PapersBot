@@ -13,14 +13,6 @@ import bs4, feedparser, tweepy
 import imghdr, json, os, re, sys, tempfile, time, urllib, yaml
 
 
-# Twitter parameters
-# These values should be queried "no more than once a day" by 
-# tweepy's api.configuration(), but for now they are fixed here.
-TWEET_MAX_LENGTH = 280
-TWEET_URL_LENGTH = 24
-TWEET_IMG_LENGTH = 25
-TWEET_NET_LENGTH = TWEET_MAX_LENGTH - TWEET_URL_LENGTH - TWEET_IMG_LENGTH
-
 
 # This is the regular expression that selects the papers of interest
 regex = re.compile(r"""
@@ -199,9 +191,18 @@ class PapersBot:
     # Connect to Twitter, unless requested not to
     if doTweet:
       self.api = initTwitter()
-      self.twconfig = getTwitterConfig(self.api)
     else:
       self.api = None
+
+    # Determine maximum tweet length
+    if doTweet:
+      twconfig = getTwitterConfig(self.api)
+      urllen = max(twconfig["short_url_length"], twconfig["short_url_length_https"])
+      imglen = twconfig["characters_reserved_per_media"]
+    else:
+      urllen = 23
+      imglen = 24
+    self.maxlength = 280 - (urllen + 1) - imglen
 
     # Start-up banner
     print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
@@ -222,7 +223,7 @@ class PapersBot:
   def sendTweet(self, entry):
     title = cleanText(htmlToText(entry.title))
     url = entry.id
-    length = TWEET_NET_LENGTH - 1
+    length = self.maxlength
 
     handle = journalHandle(url)
     if handle:
