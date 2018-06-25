@@ -271,17 +271,38 @@ class PapersBot:
     print(f"Number of papers tweeted: {self.n_tweeted}")
 
 
+  # Print out the n top tweets (most liked and RT'ed)
+  def printTopTweets(self, count = 5):
+    tweets = self.api.user_timeline(count=200)
+    oldest = tweets[-1].created_at
+    print(f"Top {count} recent tweets, by number of RT and likes, since {oldest}:\n")
+
+    tweets = [ (t.retweet_count + t.favorite_count, t.id, t) for t in tweets ]
+    tweets.sort(reverse = True)
+    for _, _, t in tweets[0:count]:
+      url = f"https://twitter.com/{t.user.screen_name}/status/{t.id}"
+      print(f"{t.retweet_count} RT {t.favorite_count} likes: {url}")
+      print(f"    {t.created_at}")
+      print(f"    {t.text}\n")
+
+
 
 def main():
   # Make sure all options are correctly typed
+  options_allowed = ["--do-not-tweet", "--top-tweets"]
   for arg in sys.argv[1:]:
-    if not arg in ["--do-not-tweet"]:
+    if not arg in options_allowed:
       print(f"Unknown option: {arg}")
       sys.exit(1)
 
   # Initialize our bot
   doTweet = not "--do-not-tweet" in sys.argv
   bot = PapersBot(doTweet)
+
+  # We can print top tweets
+  if "--top-tweets" in sys.argv:
+    bot.printTopTweets()
+    sys.exit(0)
 
   bot.run()
   bot.printStats()
