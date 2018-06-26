@@ -188,6 +188,15 @@ class PapersBot:
     self.feeds = readFeedsList()
     self.posted = readPosted()
 
+    # Read parameters from configuration file
+    try:
+      with open("config.yml", "r") as f:
+        config = yaml.load(f)
+    except:
+      config = {}
+    self.throttle = config.get("throttle", 0)
+    self.wait_time = config.get("wait_time", 5)
+
     # Connect to Twitter, unless requested not to
     if doTweet:
       self.api = initTwitter()
@@ -249,7 +258,7 @@ class PapersBot:
     self.n_tweeted += 1
 
     if self.api:
-      time.sleep(5)
+      time.sleep(self.wait_time)
 
 
   # Main function, iterating over feeds and posting new items
@@ -263,6 +272,10 @@ class PapersBot:
           if not "id" in entry: entry.id = entry.link
           if not entry.id in self.posted:
             self.sendTweet(entry)
+            # Bail out if we have reached max number of tweets
+            if self.throttle > 0 and self.n_tweeted >= self.throttle:
+              print(f"Max number of papers met ({self.throttle}), stopping now")
+              return
 
 
   # Print statistics of a given run

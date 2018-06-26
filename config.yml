@@ -1,0 +1,10 @@
+{
+  # Maximum number of papers to publish in a given run
+  # If this value is zero, all new papers matching the criteria are published
+  # Default value: 0
+  "throttle": 0,
+
+  # Time (in seconds) to wait between two tweets
+  # Default value: 5
+  "wait_time": 5,
+}
