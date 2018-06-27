@@ -246,7 +246,7 @@ class PapersBot:
     # Some URLs may match our blacklist
     if self.blacklist and self.blacklist.search(url):
       print(f"BLACKLISTED: {tweet_body}\n")
-      self.addToPosted(url)
+      self.addToPosted(entry.id)
       return
 
     media = None
@@ -262,7 +262,7 @@ class PapersBot:
     if self.api:
       self.api.update_status(tweet_body, media_ids=media)
 
-    self.addToPosted(url)
+    self.addToPosted(entry.id)
     self.n_tweeted += 1
 
     if self.api:
