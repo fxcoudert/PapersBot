@@ -7,4 +7,8 @@
   # Time (in seconds) to wait between two tweets
   # Default value: 5
   "wait_time": 5,
+
+  # URLs matching this regular expression will not be tweeted
+  # Used e.g. for Wiley journals that republish old content with new URLs
+  "blacklist": "pericles.pericles-prod.literatumonline.com",
 }

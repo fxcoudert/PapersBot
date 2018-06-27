@@ -196,6 +196,8 @@ class PapersBot:
       config = {}
     self.throttle = config.get("throttle", 0)
     self.wait_time = config.get("wait_time", 5)
+    self.blacklist = config.get("blacklist", "").strip()
+    self.blacklist = re.compile(self.blacklist) if self.blacklist else None
 
     # Connect to Twitter, unless requested not to
     if doTweet:
@@ -241,6 +243,12 @@ class PapersBot:
 
     tweet_body = title[:length] + " " + url
 
+    # Some URLs may match our blacklist
+    if self.blacklist and self.blacklist.search(url):
+      print(f"BLACKLISTED: {tweet_body}\n")
+      self.addToPosted(url)
+      return
+
     media = None
     image = findImage(entry)
     image_file = downloadImage(image)
@@ -254,7 +262,7 @@ class PapersBot:
     if self.api:
       self.api.update_status(tweet_body, media_ids=media)
 
-    self.addToPosted(entry.id)
+    self.addToPosted(url)
     self.n_tweeted += 1
 
     if self.api:
