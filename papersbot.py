@@ -132,7 +132,7 @@ def downloadImage(url):
 #
 def initTwitter():
   with open("credentials.yml", "r") as f:
-    cred = yaml.load(f)
+    cred = yaml.safe_load(f)
   auth = tweepy.OAuthHandler(cred["CONSUMER_KEY"], cred["CONSUMER_SECRET"])
   auth.set_access_token(cred["ACCESS_KEY"], cred["ACCESS_SECRET"])
   return tweepy.API(auth)
@@ -191,7 +191,7 @@ class PapersBot:
     # Read parameters from configuration file
     try:
       with open("config.yml", "r") as f:
-        config = yaml.load(f)
+        config = yaml.safe_load(f)
     except:
       config = {}
     self.throttle = config.get("throttle", 0)
