@@ -1,0 +1,12 @@
+# Maximum number of papers to publish in a given run
+# If this value is zero, all new papers matching the criteria are published
+# Default value: 0
+throttle: 0
+
+# Time (in seconds) to wait between two tweets
+# Default value: 5
+wait_time: 5
+
+# URLs matching this regular expression will not be tweeted
+# Used e.g. for Wiley journals that republish old content with new URLs
+blacklist: "pericles.pericles-prod.literatumonline.com"
