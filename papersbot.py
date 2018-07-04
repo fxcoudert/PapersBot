@@ -15,7 +15,7 @@ import imghdr, os, re, sys, tempfile, time, urllib, yaml
 
 
 # Twitter parameters
-# These values should be queried "no more than once a day" by 
+# These values should be queried "no more than once a day" by
 # tweepy's api.configuration(), but for now they are fixed here.
 TWEET_MAX_LENGTH = 280
 TWEET_URL_LENGTH = 24
@@ -25,14 +25,8 @@ TWEET_NET_LENGTH = TWEET_MAX_LENGTH - TWEET_URL_LENGTH - TWEET_IMG_LENGTH
 
 # This is the regular expression that selects the papers of interest
 regex = re.compile(r"""
-  (   \b(MOF|MOFs|COF|COFs|ZIF|ZIFs)\b
-    | metal.organic.framework
-    | covalent.organic.framework
-    | metal–organic.framework
-    | covalent–organic.framework
-    | imidazolate.framework
-    | porous.coordination.polymer
-    | framework.material
+  (   \b(CO2)\b
+    | carbon.dioxide
   )
   """, re.IGNORECASE | re.VERBOSE)
 
