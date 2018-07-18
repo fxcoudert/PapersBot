@@ -198,6 +198,7 @@ class PapersBot:
     self.wait_time = config.get("wait_time", 5)
     self.blacklist = config.get("blacklist", "").strip()
     self.blacklist = re.compile(self.blacklist) if self.blacklist else None
+    self.handles = config.get("handles", True)
 
     # Connect to Twitter, unless requested not to
     if doTweet:
@@ -237,7 +238,7 @@ class PapersBot:
     length = self.maxlength
 
     handle = journalHandle(url)
-    if handle:
+    if self.handles and handle:
       length -= len(handle) + 2
       url = f"@{handle} {url}"
 
