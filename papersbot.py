@@ -97,6 +97,9 @@ def journalHandle(url):
 
 # Find the URL for an image associated with the entry
 def findImage(entry):
+  if 'description' not in entry:
+    return
+
   soup = bs4.BeautifulSoup(entry.description, "html.parser")
   img = soup.find("img")
   if img:
