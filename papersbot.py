@@ -40,6 +40,10 @@ regex = re.compile(r"""
 
 # We select entries based on title or summary (abstract, for some feeds)
 def entryMatches(entry):
+    # Malformed entry
+    if 'title' not in entry:
+        return False
+
     if regex.search(entry.title):
         return True
     if "summary" in entry:
