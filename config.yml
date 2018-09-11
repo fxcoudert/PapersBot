@@ -11,5 +11,6 @@ wait_time: 5
 # Used e.g. for Wiley journals that republish old content with new URLs
 blacklist: "pericles.pericles-prod.literatumonline.com"
 
-# Whether to include journal Twitter handles
-handles: true
+# Whether to include journal Twitter handles. Not recommended: can lead
+# to the bot being banned for "large numbers of unsolicited mentions".
+handles: false
