@@ -317,7 +317,7 @@ class PapersBot:
 
 
     # Print out the n top tweets (most liked and RT'ed)
-    def printTopTweets(self, count=5):
+    def printTopTweets(self, count=20):
         tweets = self.api.user_timeline(count=200)
         oldest = tweets[-1].created_at
         print(f"Top {count} recent tweets, by number of RT and likes, since {oldest}:\n")
