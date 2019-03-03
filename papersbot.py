@@ -245,13 +245,11 @@ class PapersBot:
             print(f"Last tweet was posted at {last} (UTC)")
         print(f"Feed list has {len(self.feeds)} feeds\n")
 
-
     # Add to tweets posted
     def addToPosted(self, url):
         with open("posted.dat", "a+") as f:
             print(url, file=f)
         self.posted.append(url)
-
 
     # Send a tweet for a given feed entry
     def sendTweet(self, entry):
@@ -291,7 +289,6 @@ class PapersBot:
         if self.api:
             time.sleep(self.wait_time)
 
-
     # Main function, iterating over feeds and posting new items
     def run(self):
         for feed in self.feeds:
@@ -309,12 +306,10 @@ class PapersBot:
                             print(f"Max number of papers met ({self.throttle}), stopping now")
                             return
 
-
     # Print statistics of a given run
     def printStats(self):
         print(f"Number of relevant papers: {self.n_seen}")
         print(f"Number of papers tweeted: {self.n_tweeted}")
-
 
     # Print out the n top tweets (most liked and RT'ed)
     def printTopTweets(self, count=20):
