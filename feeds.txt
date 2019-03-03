@@ -51,11 +51,17 @@ http://feeds.nature.com/nenergy/rss/current
 http://feeds.nature.com/nmat/rss/current
 http://feeds.nature.com/nnano/rss/current
 http://feeds.nature.com/nphys/rss/current
-http://feeds.nature.com/commschem/rss/current
-http://feeds.nature.com/commsphys/rss/current
 http://feeds.nature.com/natrevchem/rss/current
 http://feeds.nature.com/natrevmats/rss/current
+http://feeds.nature.com/natrevphys/rss/current
 http://feeds.nature.com/ncomms/rss/current
+http://feeds.nature.com/commschem/rss/current
+http://feeds.nature.com/commsphys/rss/current
+http://feeds.nature.com/sdata/rss/current
+http://feeds.nature.com/srep/rss/current
+http://feeds.nature.com/npjqi/rss/current
+http://feeds.nature.com/npjquantmats/rss/current
+http://feeds.nature.com/npjcompumats/rss/current
 http://advances.sciencemag.org/rss/current.xml
 http://science.sciencemag.org/rss/express.xml
 # Wiley
