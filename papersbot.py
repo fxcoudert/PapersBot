@@ -99,7 +99,7 @@ def journalHandle(url):
             return "ScienceMagazine"
         if "aip.scitation.org/doi/10.1063/" in url:
             return "AIP_Publishing"
-    except:
+    except Exception:
         return None
 
 
@@ -131,7 +131,7 @@ def downloadImage(url):
 
     try:
         img, _ = urllib.request.urlretrieve(url)
-    except:
+    except Exception:
         return None
     ext = imghdr.what(img)
     res = img + "." + ext
@@ -197,7 +197,7 @@ def readPosted():
     try:
         with open("posted.dat", "r") as f:
             return f.read().splitlines()
-    except:
+    except Exception:
         return []
 
 
@@ -214,7 +214,7 @@ class PapersBot:
         try:
             with open("config.yml", "r") as f:
                 config = yaml.safe_load(f)
-        except:
+        except Except:
             config = {}
         self.throttle = config.get("throttle", 0)
         self.wait_time = config.get("wait_time", 5)
