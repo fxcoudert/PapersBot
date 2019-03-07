@@ -41,7 +41,7 @@ regex = re.compile(r"""
 # We select entries based on title or summary (abstract, for some feeds)
 def entryMatches(entry):
     # Malformed entry
-    if 'title' not in entry:
+    if "title" not in entry:
         return False
 
     if regex.search(entry.title):
@@ -105,7 +105,7 @@ def journalHandle(url):
 
 # Find the URL for an image associated with the entry
 def findImage(entry):
-    if 'description' not in entry:
+    if "description" not in entry:
         return
 
     soup = bs4.BeautifulSoup(entry.description, "html.parser")
@@ -349,5 +349,5 @@ def main():
     bot.printStats()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
