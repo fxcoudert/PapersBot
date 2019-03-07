@@ -188,6 +188,8 @@ def cleanText(s):
     s = s.replace("[ASAP]", "")
     # Some feeds have LF characeters
     s = s.replace("\x0A", "")
+    # Remove (arXiv:1903.00279v1 [cond-mat.mtrl-sci])
+    s = re.sub(r"\(arXiv:.+\)", "", s)
     # Remove multiple spaces, leading and trailing space
     return re.sub("\\s\\s+", " ", s).strip()
 
