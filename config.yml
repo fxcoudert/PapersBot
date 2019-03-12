@@ -7,9 +7,11 @@ throttle: 10
 # Default value: 5
 wait_time: 30
 
-# URLs matching this regular expression will not be tweeted
+# URLs matching these regular expressions will not be tweeted
 # Used e.g. for Wiley journals that republish old content with new URLs
-blacklist: "pericles.pericles-prod.literatumonline.com"
+blacklist:
+  - "pericles.pericles-prod.literatumonline.com"
+  - "www.onlinelibrary.wiley.com"
 
 # Whether to include journal Twitter handles. Not recommended: can lead
 # to the bot being banned for "large numbers of unsolicited mentions".
