@@ -209,7 +209,13 @@ class PapersBot:
 
         tweet_body = title[:length] + " " + url
 
-        # Some URLs may match our blacklist
+        # URL may be malformed
+        if not (url[:8] == "https://" or url[:7] == "http://"):
+            print(f"INVALID URL: {tweet_body}\n")
+            self.addToPosted(entry.id)
+            return
+
+        # URL may match our blacklist
         for regexp in self.blacklist:
             if regexp.search(url):
                 print(f"BLACKLISTED: {tweet_body}\n")
