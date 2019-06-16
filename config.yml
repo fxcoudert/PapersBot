@@ -12,7 +12,3 @@ wait_time: 30
 blacklist:
   - "pericles.pericles-prod.literatumonline.com"
   - "www.onlinelibrary.wiley.com"
-
-# Whether to include journal Twitter handles. Not recommended: can lead
-# to the bot being banned for "large numbers of unsolicited mentions".
-handles: false
