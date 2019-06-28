@@ -204,16 +204,20 @@ class PapersBot:
     # Send a tweet for a given feed entry
     def sendTweet(self, entry):
         title = cleanText(htmlToText(entry.title))
-        url = entry.id
         length = self.maxlength
 
-        tweet_body = title[:length] + " " + url
+        # Usually the ID is the canonical URL, but not always
+        if entry.id[:8] == "https://" or entry.id[:7] == "http://":
+            url = entry.id
+        else:
+            url = entry.link
 
         # URL may be malformed
         if not (url[:8] == "https://" or url[:7] == "http://"):
-            print(f"INVALID URL: {tweet_body}\n")
-            self.addToPosted(entry.id)
+            print(f"INVALID URL: {url}\n")
             return
+
+        tweet_body = title[:length] + " " + url
 
         # URL may match our blacklist
         for regexp in self.blacklist:
