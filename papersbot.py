@@ -61,6 +61,8 @@ def findImage(entry):
     img = soup.find("img")
     if img:
         img = img["src"]
+        if len(img) == 0:
+            return
         # If address is relative, append root URL
         if img[0] == "/":
             p = urllib.parse.urlparse(entry.id)
