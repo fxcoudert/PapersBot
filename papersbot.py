@@ -230,12 +230,6 @@ class PapersBot:
     url = entry.id
     length = self.maxlength
   #disable tweeting journal handle
-'''
-    handle = journalHandle(url)
-    if handle:
-      length -= len(handle) + 2
-      url = f"@{handle} {url}"
-'''
     tweet_body = title[:length] + " " + url
 
     # Some URLs may match our blacklist
