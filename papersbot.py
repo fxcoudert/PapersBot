@@ -239,7 +239,14 @@ class PapersBot:
 
         print(f"TWEET: {tweet_body}\n")
         if self.api:
-            self.api.update_status(tweet_body, media_ids=media)
+            try:
+                self.api.update_status(tweet_body, media_ids=media)
+            except tweepy.error.TweepError as e:
+                if e.api_code == 187:
+                    print("ERROR: Tweet refused as duplicate\n")
+                else:
+                    print(f"ERROR: Tweet refused, {e.reason}\n")
+                    sys.exit(1)
 
         self.addToPosted(entry.id)
         self.n_tweeted += 1
