@@ -7,6 +7,11 @@ throttle: 10
 # Default value: 5
 wait_time: 30
 
+# Should the feed list be randomly shuffled?
+# Avoids tweeting always the same journals first/last
+# Default value: true
+shuffle_feeds: true
+
 # URLs matching these regular expressions will not be tweeted
 # Used e.g. for Wiley journals that republish old content with new URLs
 blacklist:

@@ -12,6 +12,7 @@
 import imghdr
 import json
 import os
+import random
 import re
 import sys
 import tempfile
@@ -171,8 +172,13 @@ class PapersBot:
             config = {}
         self.throttle = config.get("throttle", 0)
         self.wait_time = config.get("wait_time", 5)
+        self.shuffle_feeds = config.get("shuffle_feeds", True)
         self.blacklist = config.get("blacklist", [])
         self.blacklist = [re.compile(s) for s in self.blacklist]
+
+        # Shuffle feeds list
+        if self.shuffle_feeds:
+            random.shuffle(self.feeds)
 
         # Connect to Twitter, unless requested not to
         if doTweet:
