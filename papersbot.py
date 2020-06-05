@@ -98,15 +98,23 @@ def downloadImage(url):
 
 
 # Connect to Twitter and authenticate
-#   Credentials are stored in "credentials.yml" which contains four lines:
+#   Credentials are passed in the environment,
+#   or stored in "credentials.yml" which contains four lines:
 #   CONSUMER_KEY: "x1F3s..."
 #   CONSUMER_SECRET: "3VNg..."
 #   ACCESS_KEY: "7109..."
 #   ACCESS_SECRET: "AdnA..."
 #
 def initTwitter():
-    with open("credentials.yml", "r") as f:
-        cred = yaml.safe_load(f)
+    if 'CONSUMER_KEY' in os.environ:
+        cred = {'CONSUMER_KEY': os.environ['CONSUMER_KEY'],
+                'CONSUMER_SECRET': os.environ['CONSUMER_SECRET'],
+                'ACCESS_KEY': os.environ['ACCESS_KEY'],
+                'ACCESS_SECRET': os.environ['ACCESS_SECRET']}
+    else:
+        with open("credentials.yml", "r") as f:
+            cred = yaml.safe_load(f)
+
     auth = tweepy.OAuthHandler(cred["CONSUMER_KEY"], cred["CONSUMER_SECRET"])
     auth.set_access_token(cred["ACCESS_KEY"], cred["ACCESS_SECRET"])
     return tweepy.API(auth)
