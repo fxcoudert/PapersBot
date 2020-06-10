@@ -207,8 +207,11 @@ class PapersBot:
         # Start-up banner
         print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
         if self.api:
-            last = self.api.user_timeline(count=1)[0].created_at
-            print(f"Last tweet was posted at {last} (UTC)")
+            timeline = self.api.user_timeline(count=1)
+            if len(timeline) > 0:
+                print(f"Last tweet was posted at {timeline[0].created_at} (UTC)")
+            else:
+                print(f"No tweets posted yet? Welcome, new user!")
         print(f"Feed list has {len(self.feeds)} feeds\n")
 
     # Add to tweets posted
