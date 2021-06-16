@@ -84,7 +84,9 @@ http://rss.sciencedirect.com/publication/science/13877003
 http://rss.sciencedirect.com/publication/science/00108545
 http://rss.sciencedirect.com/publication/science/13871811
 https://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10450&channel-name=Adsorption
-https://www.cell.com/chem/inpress.rss?code=cell-site
+https://www.cell.com/chem/inpress.rss
+https://www.cell.com/matter/inpress.rss
+https://www.cell.com/cell-reports-physical-science/inpress.rss
 # AIP, APS
 https://aip.scitation.org/action/showFeed?type=etoc&feed=rss&jc=apl
 https://aip.scitation.org/action/showFeed?type=etoc&feed=rss&jc=jap

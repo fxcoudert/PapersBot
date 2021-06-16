@@ -12,6 +12,7 @@
 import imghdr
 import json
 import os
+import random
 import re
 import sys
 import tempfile
@@ -97,15 +98,23 @@ def downloadImage(url):
 
 
 # Connect to Twitter and authenticate
-#   Credentials are stored in "credentials.yml" which contains four lines:
+#   Credentials are passed in the environment,
+#   or stored in "credentials.yml" which contains four lines:
 #   CONSUMER_KEY: "x1F3s..."
 #   CONSUMER_SECRET: "3VNg..."
 #   ACCESS_KEY: "7109..."
 #   ACCESS_SECRET: "AdnA..."
 #
 def initTwitter():
-    with open("credentials.yml", "r") as f:
-        cred = yaml.safe_load(f)
+    if 'CONSUMER_KEY' in os.environ:
+        cred = {'CONSUMER_KEY': os.environ['CONSUMER_KEY'],
+                'CONSUMER_SECRET': os.environ['CONSUMER_SECRET'],
+                'ACCESS_KEY': os.environ['ACCESS_KEY'],
+                'ACCESS_SECRET': os.environ['ACCESS_SECRET']}
+    else:
+        with open("credentials.yml", "r") as f:
+            cred = yaml.safe_load(f)
+
     auth = tweepy.OAuthHandler(cred["CONSUMER_KEY"], cred["CONSUMER_SECRET"])
     auth.set_access_token(cred["ACCESS_KEY"], cred["ACCESS_SECRET"])
     return tweepy.API(auth)
@@ -171,8 +180,13 @@ class PapersBot:
             config = {}
         self.throttle = config.get("throttle", 0)
         self.wait_time = config.get("wait_time", 5)
+        self.shuffle_feeds = config.get("shuffle_feeds", True)
         self.blacklist = config.get("blacklist", [])
         self.blacklist = [re.compile(s) for s in self.blacklist]
+
+        # Shuffle feeds list
+        if self.shuffle_feeds:
+            random.shuffle(self.feeds)
 
         # Connect to Twitter, unless requested not to
         if doTweet:
@@ -193,8 +207,11 @@ class PapersBot:
         # Start-up banner
         print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
         if self.api:
-            last = self.api.user_timeline(count=1)[0].created_at
-            print(f"Last tweet was posted at {last} (UTC)")
+            timeline = self.api.user_timeline(count=1)
+            if len(timeline) > 0:
+                print(f"Last tweet was posted at {timeline[0].created_at} (UTC)")
+            else:
+                print(f"No tweets posted yet? Welcome, new user!")
         print(f"Feed list has {len(self.feeds)} feeds\n")
 
     # Add to tweets posted
