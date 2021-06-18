@@ -120,21 +120,6 @@ def initTwitter():
     return tweepy.API(auth)
 
 
-def getTwitterConfig(api):
-    # Check for cached configuration, no more than a day old
-    if os.path.isfile("twitter_config.dat"):
-        mtime = os.stat("twitter_config.dat").st_mtime
-        if time.time() - mtime < 24 * 60 * 60:
-            with open("twitter_config.dat", "r") as f:
-                return json.load(f)
-
-    # Otherwise, query the Twitter API and cache the result
-    config = api.configuration()
-    with open("twitter_config.dat", "w") as f:
-        json.dump(config, f)
-    return config
-
-
 # Read our list of feeds from file
 def readFeedsList():
     with open("feeds.txt", "r") as f:
@@ -194,14 +179,11 @@ class PapersBot:
         else:
             self.api = None
 
+        # Maximum shortened URL length (previously short_url_length_https)
+        urllen = 23
+        # Maximum URL length for media (previously characters_reserved_per_media)
+        imglen = 24
         # Determine maximum tweet length
-        if doTweet:
-            twconfig = getTwitterConfig(self.api)
-            urllen = max(twconfig["short_url_length"], twconfig["short_url_length_https"])
-            imglen = twconfig["characters_reserved_per_media"]
-        else:
-            urllen = 23
-            imglen = 24
         self.maxlength = 280 - (urllen + 1) - imglen
 
         # Start-up banner
