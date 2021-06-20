@@ -26,7 +26,7 @@ ACCESS_SECRET: "AdnA..."
 ```
 If you do not know how to get your Twitter credentials, follow [steps #1 and #2 in this tutorial](https://www.digitalocean.com/community/tutorials/how-to-create-a-twitter-app) to register your app with Twitter and get credentials.
 - Adjust the file `feeds.txt` which contains the list of RSS feeds you want to crawl. Lines starting with `#` are ignored.
-- Inside the code, ajust the [regular expression](https://en.wikipedia.org/wiki/Regular_expression) that selects the papers of interest
+- Inside the code, adjust the [regular expression](https://en.wikipedia.org/wiki/Regular_expression) that selects the papers of interest
 - Some extra parameters can be tweaked in configuration file `config.yml`.
 
 ## How to run
