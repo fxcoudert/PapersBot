@@ -18,6 +18,9 @@ import imghdr, json, os, re, sys, tempfile, time, urllib, yaml
 regex = re.compile(r"""
   (   \b(CO2)\b
     | carbon.dioxide
+    | carbon.dioxide.reduction
+    | carbon.dioxide.capture
+    | CO2
   )
   """, re.IGNORECASE | re.VERBOSE)
 
@@ -229,12 +232,13 @@ class PapersBot:
     title = cleanText(htmlToText(entry.title))
     url = entry.id
     length = self.maxlength
-
+  #disable tweeting journal handle
+'''
     handle = journalHandle(url)
     if handle:
       length -= len(handle) + 2
       url = f"@{handle} {url}"
-
+'''
     tweet_body = title[:length] + " " + url
 
     # Some URLs may match our blacklist
