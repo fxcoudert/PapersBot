@@ -12,7 +12,7 @@ PapersBot was inspired by (and borrows some code from) [feedr](https://github.co
 
 Python 3 and the following modules: [pyyaml](https://pyyaml.org/), [beautifulsoup4](https://pypi.org/project/beautifulsoup4/), [feedparser](https://github.com/kurtmckee/feedparser), [tweepy](https://github.com/tweepy/tweepy).
 
-If you have Python 3 installed, you can install those modules with  `pip install pyyaml bs4 feedparser tweepy`.
+If you have Python 3 installed, you can install those modules with  `pip install pyyaml bs4 feedparser tweepy`. On some systems (like Debian), `pip` may actually be called `pip3` for Python 3.
 
 ## Setup
 
