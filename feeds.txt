@@ -101,7 +101,7 @@ http://feeds.aps.org/rss/recent/pre.xml
 http://feeds.aps.org/rss/recent/prmaterials.xml
 http://feeds.aps.org/rss/recent/rmp.xml
 # Preprints
-https://chemrxiv.org/rss/portal/chemrxiv
+https://chemrxiv.org/engage/rss/chemrxiv
 http://export.arxiv.org/rss/cond-mat.str-el
 http://export.arxiv.org/rss/cond-mat.mtrl-sci
 http://export.arxiv.org/rss/physics.app-ph
