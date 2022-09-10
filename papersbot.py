@@ -131,7 +131,7 @@ def readFeedsList():
 def cleanText(s):
     # Annoying ASAP tags
     s = s.replace("[ASAP]", "")
-    # Some feeds have LF characeters
+    # Some feeds have LF characters
     s = s.replace("\x0A", "")
     # Remove (arXiv:1903.00279v1 [cond-mat.mtrl-sci])
     s = re.sub(r"\(arXiv:.+\)", "", s)
