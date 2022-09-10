@@ -144,7 +144,7 @@ def readPosted():
     try:
         with open("posted.dat", "r") as f:
             return f.read().splitlines()
-    except Exception:
+    except OSError:
         return []
 
 
@@ -161,7 +161,7 @@ class PapersBot:
         try:
             with open("config.yml", "r") as f:
                 config = yaml.safe_load(f)
-        except Except:
+        except OSError:
             config = {}
         self.throttle = config.get("throttle", 0)
         self.wait_time = config.get("wait_time", 5)
