@@ -21,6 +21,7 @@ import yaml
 import bs4
 import feedparser
 import tweepy
+from mastodon import Mastodon, MastodonError
 
 
 # This is the regular expression that selects the papers of interest
@@ -115,7 +116,37 @@ def initTwitter():
 
     auth = tweepy.OAuthHandler(cred["CONSUMER_KEY"], cred["CONSUMER_SECRET"])
     auth.set_access_token(cred["ACCESS_KEY"], cred["ACCESS_SECRET"])
+
+    print("Twitter authentification worked")
     return tweepy.API(auth)
+
+
+# Connect to Mastodon
+#   Credentials are passed in the environment,
+#   or stored in "mastodon_credentials.yml" which contains five lines:
+# MASTODON_API_BASE_URL: "https://mstdn.science"
+# MASTODON_CLIENT_ID: "xxx"
+# MASTODON_CLIENT_SECRET: "xxx"
+# MASTODON_USER: "xxx@xxx.com"
+# MASTODON_PASSWORD: "xxx"
+#
+def initMastodon():
+    if 'MASTODON_API_BASE_URL' in os.environ:
+        cred = {'API_BASE_URL': os.environ['MASTODON_API_BASE_URL'],
+                'CLIENT_ID': os.environ['MASTODON_CLIENT_ID'],
+                'CLIENT_SECRET': os.environ['MASTODON_CLIENT_SECRET'],
+                'USER': os.environ['MASTODON_USER'],
+                'PASSWORD': os.environ['MASTODON_PASSWORD']}
+    else:
+        with open("mastodon_credentials.yml", "r") as f:
+            cred = yaml.safe_load(f)
+
+    mastodon = Mastodon(client_id=cred["CLIENT_ID"], client_secret=cred["CLIENT_SECRET"], api_base_url=cred["API_BASE_URL"])
+    token = mastodon.log_in(cred["USER"], cred["PASSWORD"])
+    mastodon = Mastodon(access_token=token, api_base_url=cred["API_BASE_URL"])
+
+    print("Mastodon authentification worked")
+    return mastodon
 
 
 # Read our list of feeds from file
@@ -174,8 +205,13 @@ class PapersBot:
         # Connect to Twitter, unless requested not to
         if doTweet:
             self.api = initTwitter()
+            try:
+                self.mastodon = initMastodon()
+            except:
+                self.mastodon = None
         else:
             self.api = None
+            self.mastodon = None
 
         # Maximum shortened URL length (previously short_url_length_https)
         urllen = 23
@@ -226,12 +262,15 @@ class PapersBot:
                 return
 
         media = None
+        mastodon_media = None
         image = findImage(entry)
         image_file = downloadImage(image)
         if image_file:
             print(f"IMAGE: {image}")
             if self.api:
                 media = [self.api.media_upload(image_file).media_id]
+            if self.mastodon:
+                mastodon_media = [self.mastodon.media_post(image_file)]
             os.remove(image_file)
 
         print(f"TWEET: {tweet_body}\n")
@@ -244,11 +283,17 @@ class PapersBot:
                 else:
                     print(f"ERROR: Tweet refused, {e.reason}\n")
                     sys.exit(1)
+        if self.mastodon:
+            try:
+                self.mastodon.status_post(tweet_body, media_ids=mastodon_media)
+            except MastodonError as e:
+                print("ERROR: Toot refused, {e.reason}\n")
+                sys.exit(1)
 
         self.addToPosted(entry.id)
         self.n_tweeted += 1
 
-        if self.api:
+        if self.api or self.mastodon:
             time.sleep(self.wait_time)
 
     # Main function, iterating over feeds and posting new items
