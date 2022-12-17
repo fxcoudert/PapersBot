@@ -48,6 +48,7 @@ http://feeds.rsc.org/rss/en
 http://feeds.rsc.org/rss/fd
 http://feeds.rsc.org/rss/gc
 http://feeds.rsc.org/rss/lc
+http://feeds.rsc.org/rss/mh
 http://feeds.rsc.org/rss/nj
 http://feeds.rsc.org/rss/nr
 http://feeds.rsc.org/rss/ob
