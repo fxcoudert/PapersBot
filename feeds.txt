@@ -110,6 +110,7 @@ http://rss.sciencedirect.com/publication/science/00404020
 http://rss.sciencedirect.com/publication/science/00404039
 http://rss.sciencedirect.com/publication/science/13871811
 http://rss.sciencedirect.com/publication/science/13877003
+http://rss.sciencedirect.com/publication/science/13858947
 https://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=10450&channel-name=Adsorption
 https://link.springer.com/search.rss?facet-content-type=Article&facet-journal-id=41981&channel-name=Journal+of+Flow+Chemistry
 https://www.cell.com/cell-reports-physical-science/inpress.rss
