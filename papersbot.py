@@ -85,8 +85,13 @@ def downloadImage(url):
     except Exception:
         return None
     ext = imghdr.what(img)
-    res = img + "." + ext
-    os.rename(img, res)
+    if ext:
+        # Rename to make type clear
+        res = f"{img}.{ext}"
+        os.rename(img, res)
+    else:
+        # Not an image
+        return None
 
     # Images smaller than 4 KB have a problem, and Twitter will complain
     if os.path.getsize(res) < 4096:
