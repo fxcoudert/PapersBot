@@ -119,11 +119,19 @@ def initTwitter():
         with open("credentials.yml", "r") as f:
             cred = yaml.safe_load(f)
 
+    # v1 API
     auth = tweepy.OAuthHandler(cred["CONSUMER_KEY"], cred["CONSUMER_SECRET"])
     auth.set_access_token(cred["ACCESS_KEY"], cred["ACCESS_SECRET"])
+    v1 = tweepy.API(auth)
+
+    # v2 API
+    v2 = tweepy.Client(consumer_key=cred["CONSUMER_KEY"],
+                       consumer_secret=cred["CONSUMER_SECRET"],
+                       access_token=cred["ACCESS_KEY"],
+                       access_token_secret=cred["ACCESS_SECRET"])
 
     print("Twitter authentification worked")
-    return tweepy.API(auth)
+    return v1, v2
 
 
 # Connect to Mastodon
@@ -209,13 +217,14 @@ class PapersBot:
 
         # Connect to Twitter, unless requested not to
         if doTweet:
-            self.api = initTwitter()
+            self.api_v1, self.api_v2 = initTwitter()
             try:
                 self.mastodon = initMastodon()
             except:
                 self.mastodon = None
         else:
-            self.api = None
+            self.api_v1 = None
+            self.api_v2 = None
             self.mastodon = None
 
         # Maximum shortened URL length (previously short_url_length_https)
@@ -227,12 +236,6 @@ class PapersBot:
 
         # Start-up banner
         print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
-        if self.api:
-            timeline = self.api.user_timeline(count=1)
-            if len(timeline) > 0:
-                print(f"Last tweet was posted at {timeline[0].created_at} (UTC)")
-            else:
-                print(f"No tweets posted yet? Welcome, new user!")
         print(f"Feed list has {len(self.feeds)} feeds\n")
 
     # Add to tweets posted
@@ -272,16 +275,16 @@ class PapersBot:
         image_file = downloadImage(image)
         if image_file:
             print(f"IMAGE: {image}")
-            if self.api:
-                media = [self.api.media_upload(image_file).media_id]
+            if self.api_v1:
+                media = [self.api_v1.media_upload(image_file).media_id]
             if self.mastodon:
                 mastodon_media = [self.mastodon.media_post(image_file)]
             os.remove(image_file)
 
         print(f"TWEET: {tweet_body}\n")
-        if self.api:
+        if self.api_v2:
             try:
-                self.api.update_status(tweet_body, media_ids=media)
+                self.api_v2.create_tweet(text=tweet_body, media_ids=media)
             except tweepy.errors.TweepyException as e:
                 if 187 in e.api_codes:
                     print("ERROR: Tweet refused as duplicate\n")
@@ -298,7 +301,7 @@ class PapersBot:
         self.addToPosted(entry.id)
         self.n_tweeted += 1
 
-        if self.api or self.mastodon:
+        if self.api_v2 or self.mastodon:
             time.sleep(self.wait_time)
 
     # Main function, iterating over feeds and posting new items
@@ -325,7 +328,7 @@ class PapersBot:
 
     # Print out the n top tweets (most liked and RT'ed)
     def printTopTweets(self, count=20):
-        tweets = self.api.user_timeline(count=200)
+        tweets = self.api_v1.user_timeline(count=200)
         oldest = tweets[-1].created_at
         print(f"Top {count} recent tweets, by number of RT and likes, since {oldest}:\n")
 
