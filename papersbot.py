@@ -220,7 +220,7 @@ class PapersBot:
             self.api_v1, self.api_v2 = initTwitter()
             try:
                 self.mastodon = initMastodon()
-            except:
+            except Exception:
                 self.mastodon = None
         else:
             self.api_v1 = None
@@ -285,6 +285,9 @@ class PapersBot:
         if self.api_v2:
             try:
                 self.api_v2.create_tweet(text=tweet_body, media_ids=media)
+            except tweepy.errors.TooManyRequests as e:
+                print("ERROR: Too many requests, rate limit hit. Stopping now.\n")
+                sys.exit(1)
             except tweepy.errors.TweepyException as e:
                 if 187 in e.api_codes:
                     print("ERROR: Tweet refused as duplicate\n")
