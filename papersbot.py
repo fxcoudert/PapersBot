@@ -298,7 +298,7 @@ class PapersBot:
             try:
                 self.mastodon.status_post(tweet_body, media_ids=mastodon_media)
             except MastodonError as e:
-                print("ERROR: Toot refused, {e.reason}\n")
+                print("ERROR: Toot refused: {e}\n")
                 sys.exit(1)
 
         self.addToPosted(entry.id)
