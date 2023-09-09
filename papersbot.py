@@ -102,6 +102,57 @@ def downloadImage(url):
     return res
 
 
+# Helper functions for Bluesky, adapted from
+# https://github.com/MarshalX/atproto/blob/main/examples/advanced_usage/auto_hyperlinks.py
+
+def bluesky_extract_url_byte_positions(text, *, aggressive: bool, encoding='UTF-8'):
+    """
+    If aggressive is False, only links beginning http or https will be detected
+    """
+    encoded_text = text.encode(encoding)
+
+    if aggressive:
+        pattern = rb'(?:[\w+]+\:\/\/)?(?:[\w\d-]+\.)*[\w-]+[\.\:]\w+\/?(?:[\/\?\=\&\#\.]?[\w-]+)+\/?'
+    else:
+        pattern = rb'https?\:\/\/(?:[\w\d-]+\.)*[\w-]+[\.\:]\w+\/?(?:[\/\?\=\&\#\.]?[\w-]+)+\/?'
+
+    matches = re.finditer(pattern, encoded_text)
+    url_byte_positions = []
+    for match in matches:
+        url_bytes = match.group(0)
+        url = url_bytes.decode(encoding)
+        url_byte_positions.append((url, match.start(), match.end()))
+
+    return url_byte_positions
+
+
+def bluesky_post_with_links(client, text):
+    """
+    Send a skeet, identifying and handling links
+    """
+    # Determine locations of URLs in the post's text
+    url_positions = bluesky_extract_url_byte_positions(text, aggressive=False)
+    facets = []
+
+    # AT requires URL to include http or https when creating the facet. Appends to URL if not present
+    for link in url_positions:
+        uri = link[0] if link[0].startswith('http') else f'https://{link[0]}'
+        facets.append(
+            atproto.models.AppBskyRichtextFacet.Main(
+                features=[atproto.models.AppBskyRichtextFacet.Link(uri=uri)],
+                index=atproto.models.AppBskyRichtextFacet.ByteSlice(byte_start=link[1], byte_end=link[2]),
+            )
+        )
+
+    client.com.atproto.repo.create_record(
+        atproto.models.ComAtprotoRepoCreateRecord.Data(
+            repo=client.me.did,
+            collection=atproto.models.ids.AppBskyFeedPost,
+            record=atproto.models.AppBskyFeedPost.Main(created_at=client.get_current_time_iso(), text=text, facets=facets),
+        )
+    )
+
+
 # Connect to Twitter and authenticate
 #   Credentials are passed in the environment,
 #   or stored in "credentials.yml" which contains four lines:
@@ -242,7 +293,7 @@ class PapersBot:
             self.api_v1, self.api_v2 = initTwitter()
             # Try to connect to Bluesky
             try:
-                self.blueskye = initBluesky()
+                self.bluesky = initBluesky()
             except Exception:
                 print('Did not connect to Bluesky')
                 self.bluesky = None
@@ -308,6 +359,9 @@ class PapersBot:
             print(f"IMAGE: {image}")
             if self.api_v1:
                 media = [self.api_v1.media_upload(image_file).media_id]
+            if self.bluesky:
+                # TODO -- send images on Bluesky
+                pass
             if self.mastodon:
                 mastodon_media = [self.mastodon.media_post(image_file)]
             os.remove(image_file)
@@ -325,11 +379,20 @@ class PapersBot:
                 else:
                     print(f"ERROR: Tweet refused, {e.reason}\n")
                     sys.exit(1)
+        if self.bluesky:
+            try:
+                # Simple method, but does not include links as links
+                # self.bluesky.send_post(text=tweet_body)
+                # Smarter way:
+                bluesky_post_with_links(self.bluesky, tweet_body)
+            except Exception as e:
+                print(f"ERROR: Bluesky post refused: {e}\n")
+                sys.exit(1)
         if self.mastodon:
             try:
                 self.mastodon.status_post(tweet_body, media_ids=mastodon_media)
             except MastodonError as e:
-                print("ERROR: Toot refused: {e}\n")
+                print(f"ERROR: Toot refused: {e}\n")
                 sys.exit(1)
 
         self.addToPosted(entry.id)
