@@ -18,6 +18,7 @@ import time
 import urllib
 import yaml
 
+import atproto
 import bs4
 import feedparser
 import tweepy
@@ -162,6 +163,27 @@ def initMastodon():
     return mastodon
 
 
+# Connect to Bluesky
+#   Credentials are passed in the environment,
+#   or stored in "bluesky_credentials.yml" which contains two lines:
+# BLUESKY_HANDLE: "xxx.bsky.social"
+# BLUESKY_APP_PASSWORD: "xxx"
+#
+def initBluesky():
+    if 'BLUESKY_HANDLE' in os.environ:
+        cred = {'HANDLE': os.environ['BLUESKY_HANDLE'],
+                'APP_PASSWORD': os.environ['BLUESKY_APP_PASSWORD']}
+    else:
+        with open("bluesky_credentials.yml", "r") as f:
+            cred = yaml.safe_load(f)
+
+    bluesky = atproto.Client()
+    bluesky.login(cred['HANDLE'], cred['APP_PASSWORD'])
+
+    print("Bluesky authentification worked")
+    return bluesky
+
+
 # Read our list of feeds from file
 def readFeedsList():
     with open("feeds.txt", "r") as f:
@@ -218,13 +240,22 @@ class PapersBot:
         # Connect to Twitter, unless requested not to
         if doTweet:
             self.api_v1, self.api_v2 = initTwitter()
+            # Try to connect to Bluesky
+            try:
+                self.blueskye = initBluesky()
+            except Exception:
+                print('Did not connect to Bluesky')
+                self.bluesky = None
+            # Try to connect to Mastodon
             try:
                 self.mastodon = initMastodon()
             except Exception:
+                print('Did not connect to Mastodon')
                 self.mastodon = None
         else:
             self.api_v1 = None
             self.api_v2 = None
+            self.bluesky = None
             self.mastodon = None
 
         # Maximum shortened URL length (previously short_url_length_https)
