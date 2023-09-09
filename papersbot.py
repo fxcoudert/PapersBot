@@ -112,9 +112,9 @@ def bluesky_extract_url_byte_positions(text, *, aggressive: bool, encoding='UTF-
     encoded_text = text.encode(encoding)
 
     if aggressive:
-        pattern = rb'(?:[\w+]+\:\/\/)?(?:[\w\d-]+\.)*[\w-]+[\.\:]\w+\/?(?:[\/\?\=\&\#\.]?[\w-]+)+\/?'
+        pattern = rb'(?:[\w+]+\:\/\/)?(?:[\w\d-]+\.)*[\w-]+[\.\:]\w+\/?(?:[\/\?\=\&\#\.\(\)]?[\w-]+)+\/?'
     else:
-        pattern = rb'https?\:\/\/(?:[\w\d-]+\.)*[\w-]+[\.\:]\w+\/?(?:[\/\?\=\&\#\.]?[\w-]+)+\/?'
+        pattern = rb'https?\:\/\/(?:[\w\d-]+\.)*[\w-]+[\.\:]\w+\/?(?:[\/\?\=\&\#\.\(\)]?[\w-]+)+\/?'
 
     matches = re.finditer(pattern, encoded_text)
     url_byte_positions = []
@@ -126,13 +126,22 @@ def bluesky_extract_url_byte_positions(text, *, aggressive: bool, encoding='UTF-
     return url_byte_positions
 
 
-def bluesky_post_with_links(client, text):
+def bluesky_post_with_links(client, text, image_file):
     """
     Send a skeet, identifying and handling links
     """
     # Determine locations of URLs in the post's text
     url_positions = bluesky_extract_url_byte_positions(text, aggressive=False)
     facets = []
+
+    if image_file:
+        with open(image_file, 'rb') as f:
+            img_data = f.read()
+        upload = client.com.atproto.repo.upload_blob(img_data)
+        images = [atproto.models.AppBskyEmbedImages.Image(alt="TOC Graphic", image=upload.blob)]
+        embed = atproto.models.AppBskyEmbedImages.Main(images=images)
+    else:
+        embed = None
 
     # AT requires URL to include http or https when creating the facet. Appends to URL if not present
     for link in url_positions:
@@ -148,7 +157,7 @@ def bluesky_post_with_links(client, text):
         atproto.models.ComAtprotoRepoCreateRecord.Data(
             repo=client.me.did,
             collection=atproto.models.ids.AppBskyFeedPost,
-            record=atproto.models.AppBskyFeedPost.Main(created_at=client.get_current_time_iso(), text=text, facets=facets),
+            record=atproto.models.AppBskyFeedPost.Main(created_at=client.get_current_time_iso(), text=text, facets=facets, embed=embed),
         )
     )
 
@@ -360,11 +369,10 @@ class PapersBot:
             if self.api_v1:
                 media = [self.api_v1.media_upload(image_file).media_id]
             if self.bluesky:
-                # TODO -- send images on Bluesky
+                # For Bluesky, this is handled below
                 pass
             if self.mastodon:
                 mastodon_media = [self.mastodon.media_post(image_file)]
-            os.remove(image_file)
 
         print(f"TWEET: {tweet_body}\n")
         if self.api_v2:
@@ -384,7 +392,7 @@ class PapersBot:
                 # Simple method, but does not include links as links
                 # self.bluesky.send_post(text=tweet_body)
                 # Smarter way:
-                bluesky_post_with_links(self.bluesky, tweet_body)
+                bluesky_post_with_links(self.bluesky, tweet_body, image_file)
             except Exception as e:
                 print(f"ERROR: Bluesky post refused: {e}\n")
                 sys.exit(1)
@@ -397,6 +405,9 @@ class PapersBot:
 
         self.addToPosted(entry.id)
         self.n_tweeted += 1
+
+        if image_file:
+            os.remove(image_file)
 
         if self.api_v2 or self.mastodon:
             time.sleep(self.wait_time)
