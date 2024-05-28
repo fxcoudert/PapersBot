@@ -157,7 +157,7 @@ def bluesky_post_with_links(client, text, image_file):
         atproto.models.ComAtprotoRepoCreateRecord.Data(
             repo=client.me.did,
             collection=atproto.models.ids.AppBskyFeedPost,
-            record=atproto.models.AppBskyFeedPost.Main(created_at=client.get_current_time_iso(), text=text, facets=facets, embed=embed),
+            record=atproto.models.AppBskyFeedPost.Record(created_at=client.get_current_time_iso(), text=text, facets=facets, embed=embed),
         )
     )
 
