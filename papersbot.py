@@ -418,11 +418,11 @@ class PapersBot:
             try:
                 parsed_feed = feedparser.parse(feed)
             except ConnectionResetError as e:
-                ### FIXME --- temporary hack to try and reduce the number of failures in GitHub Actions
+                # Print information about which feed is failing, and what is the error
                 print("Failure to load feed at URL", feed)
                 print("Exception info:", str(e))
                 sys.exit(1)
-                ### FIXME --- end of temporary hack
+
             for entry in parsed_feed.entries:
                 if entryMatches(entry):
                     self.n_seen += 1
