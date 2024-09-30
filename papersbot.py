@@ -415,6 +415,9 @@ class PapersBot:
     # Main function, iterating over feeds and posting new items
     def run(self):
         for feed in self.feeds:
+            ### FIXME --- temporary hack to try and reduce the number of failures in GitHub Actions
+            time.sleep(0.5)
+            ### FIXME --- end of temporary hack
             parsed_feed = feedparser.parse(feed)
             for entry in parsed_feed.entries:
                 if entryMatches(entry):
