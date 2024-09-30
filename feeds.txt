@@ -213,7 +213,7 @@ https://www.thieme-connect.de/rss/thieme/en/10.1055-s-00000083.xml
 https://www.thieme-connect.de/rss/thieme/en/10.1055-s-00000084.xml
 # Preprints
 https://chemrxiv.org/engage/rss/chemrxiv
-http://export.arxiv.org/rss/cond-mat.mtrl-sci
-http://export.arxiv.org/rss/cond-mat.str-el
-http://export.arxiv.org/rss/physics.app-ph
-http://export.arxiv.org/rss/physics.chem-ph
+https://rss.arxiv.org/rss/cond-mat.mtrl-sci
+https://rss.arxiv.org/rss/cond-mat.str-el
+https://rss.arxiv.org/rss/physics.app-ph
+https://rss.arxiv.org/rss/physics.chem-ph
