@@ -415,10 +415,14 @@ class PapersBot:
     # Main function, iterating over feeds and posting new items
     def run(self):
         for feed in self.feeds:
-            ### FIXME --- temporary hack to try and reduce the number of failures in GitHub Actions
-            time.sleep(0.5)
-            ### FIXME --- end of temporary hack
-            parsed_feed = feedparser.parse(feed)
+            try:
+                parsed_feed = feedparser.parse(feed)
+            except ConnectionResetError as e:
+                ### FIXME --- temporary hack to try and reduce the number of failures in GitHub Actions
+                print("Failure to load feed at URL", feed)
+                print("Exception info:", str(e))
+                sys.exit(1)
+                ### FIXME --- end of temporary hack
             for entry in parsed_feed.entries:
                 if entryMatches(entry):
                     self.n_seen += 1
