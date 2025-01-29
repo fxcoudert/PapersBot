@@ -9,7 +9,6 @@
 # e-mail:   fxcoudert@gmail.com
 #
 
-import imghdr
 import os
 import random
 import re
@@ -21,6 +20,7 @@ import yaml
 import atproto
 import bs4
 import feedparser
+import filetype
 import tweepy
 from mastodon import Mastodon, MastodonError
 
@@ -85,10 +85,10 @@ def downloadImage(url):
         img, _ = urllib.request.urlretrieve(url)
     except Exception:
         return None
-    ext = imghdr.what(img)
-    if ext:
+    kind = filetype.guess(img)
+    if kind:
         # Rename to make type clear
-        res = f"{img}.{ext}"
+        res = f"{img}.{kind.extension}"
         os.rename(img, res)
     else:
         # Not an image
