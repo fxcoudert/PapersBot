@@ -385,7 +385,7 @@ class PapersBot:
                 if 187 in e.api_codes:
                     print("ERROR: Tweet refused as duplicate\n")
                 else:
-                    print(f"ERROR: Tweet refused, {e.reason}\n")
+                    print(f"ERROR: Tweet refused, {repr(e)}\n")
                     sys.exit(1)
         if self.bluesky:
             try:
