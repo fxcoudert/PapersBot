@@ -379,8 +379,9 @@ class PapersBot:
             try:
                 self.api_v2.create_tweet(text=tweet_body, media_ids=media)
             except tweepy.errors.TooManyRequests as e:
-                print("ERROR: Too many requests, rate limit hit. Stopping now.\n")
-                sys.exit(1)
+                print("ERROR: Too many requests, Twitter rate limit hit. Stopping now.\n")
+                # Rate limit is not considered as an error, return code zero
+                sys.exit(0)
             except tweepy.errors.TweepyException as e:
                 if 187 in e.api_codes:
                     print("ERROR: Tweet refused as duplicate\n")
