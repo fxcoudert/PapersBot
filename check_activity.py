@@ -24,6 +24,6 @@ assert hours_ago > 0
 
 print(f"Last commit to 'posted.dat' was {hours_ago:.2f} hours ago")
 
-if hours_ago > 12:
+if hours_ago > 16:
     print("ERROR: lack of activity, check actions for problems")
     sys.exit(1)
