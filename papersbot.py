@@ -171,6 +171,10 @@ def bluesky_post_with_links(client, text, image_file):
 #   ACCESS_SECRET: "AdnA..."
 #
 def initTwitter():
+    ## FIXME -- find a nicer way to disable Twitter
+    ## Twitter is not used anymore because of pricing increases ($0.20 per link)
+    return None, None
+
     if 'CONSUMER_KEY' in os.environ:
         cred = {'CONSUMER_KEY': os.environ['CONSUMER_KEY'],
                 'CONSUMER_SECRET': os.environ['CONSUMER_SECRET'],
