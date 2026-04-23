@@ -410,7 +410,7 @@ class PapersBot:
         if image_file:
             os.remove(image_file)
 
-        if self.api_v2 or self.mastodon:
+        if self.api_v2 or self.bluesky or self.mastodon:
             time.sleep(self.wait_time)
 
     # Main function, iterating over feeds and posting new items
