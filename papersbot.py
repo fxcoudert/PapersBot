@@ -10,11 +10,15 @@
 #
 
 import os
+import json
 import random
 import re
 import sys
 import time
 import urllib
+import urllib.error
+import urllib.parse
+import urllib.request
 import yaml
 
 import atproto
@@ -171,7 +175,7 @@ def bluesky_post_with_links(client, text, image_file):
 #   ACCESS_SECRET: "AdnA..."
 #
 def initTwitter():
-    ## FIXME -- find a nicer way to disable Twitter
+    ## FIXME - find a nicer way to disable Twitter
     ## Twitter is not used anymore because of pricing increases ($0.20 per link)
     return None, None
 
@@ -197,6 +201,42 @@ def initTwitter():
 
     print("Twitter authentification worked")
     return v1, v2
+
+
+# Connect to Xquik
+#   Credentials are passed in the environment:
+# XQUIK_API_KEY: "..."
+# XQUIK_ACCOUNT: "account"
+# XQUIK_API_BASE: "https://xquik.com/api/v1"  # optional
+#
+def initXquik():
+    if not os.environ.get("XQUIK_API_KEY") or not os.environ.get("XQUIK_ACCOUNT"):
+        return None
+
+    print("Xquik posting enabled")
+    return {
+        "api_key": os.environ["XQUIK_API_KEY"],
+        "account": os.environ["XQUIK_ACCOUNT"],
+        "base": os.environ.get("XQUIK_API_BASE", "https://xquik.com/api/v1").rstrip("/"),
+    }
+
+
+def xquikPostTweet(config, text):
+    body = json.dumps({
+        "account": config["account"],
+        "text": text,
+    }).encode("utf-8")
+    request = urllib.request.Request(
+        f"{config['base']}/x/tweets",
+        data=body,
+        headers={
+            "Content-Type": "application/json",
+            "x-api-key": config["api_key"],
+        },
+        method="POST",
+    )
+    with urllib.request.urlopen(request, timeout=30) as response:
+        response.read()
 
 
 # Connect to Mastodon
@@ -304,6 +344,7 @@ class PapersBot:
         # Connect to Twitter, unless requested not to
         if doTweet:
             self.api_v1, self.api_v2 = initTwitter()
+            self.xquik = initXquik()
             # Try to connect to Bluesky
             try:
                 self.bluesky = initBluesky()
@@ -319,6 +360,7 @@ class PapersBot:
         else:
             self.api_v1 = None
             self.api_v2 = None
+            self.xquik = None
             self.bluesky = None
             self.mastodon = None
 
@@ -392,6 +434,18 @@ class PapersBot:
                 else:
                     print(f"ERROR: Tweet refused, {repr(e)}\n")
                     sys.exit(1)
+        if self.xquik:
+            if image_file:
+                print("Skipping Xquik post with local image; use a public media URL for Xquik media tweets.\n")
+            else:
+                try:
+                    xquikPostTweet(self.xquik, tweet_body)
+                except urllib.error.HTTPError as e:
+                    print(f"ERROR: Xquik post refused ({e.code}): {e.read().decode('utf-8')}\n")
+                    sys.exit(1)
+                except urllib.error.URLError as e:
+                    print(f"ERROR: Xquik post failed: {e}\n")
+                    sys.exit(1)
         if self.bluesky:
             try:
                 # Simple method, but does not include links as links
@@ -414,7 +468,7 @@ class PapersBot:
         if image_file:
             os.remove(image_file)
 
-        if self.api_v2 or self.bluesky or self.mastodon:
+        if self.api_v2 or self.xquik or self.bluesky or self.mastodon:
             time.sleep(self.wait_time)
 
     # Main function, iterating over feeds and posting new items
