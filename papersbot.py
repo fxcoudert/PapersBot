@@ -327,7 +327,7 @@ class PapersBot:
         # Maximum URL length for media (previously characters_reserved_per_media)
         imglen = 24
         # Determine maximum tweet length
-        self.maxlength = 280 - (urllen + 1) - imglen
+        self.maxlength = 260 - (urllen + 1) - imglen
 
         # Start-up banner
         print(f"This is PapersBot running at {time.strftime('%Y-%m-%d %H:%M:%S %Z')}")
